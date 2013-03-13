@@ -1,15 +1,23 @@
 <html>
 
   <head>
-    <title>Earth-Moon</title>
+    <title>Earth-Moon Game</title>
     <script type="text/javascript" src="jsxgraphcore.js"></script>
     <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
   </head>
 
   <body>
+    <div id="explanation" class="content-block">
+        <h3>Earth-Moon Game</h3>
+        <p>Object of the game: position the moon by dragging it to the right, so it's the correct distance from the Earth. 
+          You may need to drag the background to reposition the Earth and Moon as needed, and zoom with the mouse wheel (or pinch on touch device).
+        </p>
+        <p>When you've finished click "Score" to see how you did.</p>
+    </div>
     <div id="box" class="jxgbox" style="width:1500px; height:600px; background:black"></div>
-    <a href="javascript:void();" id="score">Score</a>
-    
+    <div id="result" class="content-block">
+      <a href="javascript:void();" id="score">Score</a>
+    </div>
     <script type="text/javascript">
       JXG.Options.pan.enabled = true;
       JXG.Options.pan.needShift = false;
@@ -19,7 +27,7 @@
       JXG.Options.zoom.needShift = false;
     
       var board = JXG.JSXGraph.initBoard('box', {
-        boundingbox: [-20, 10, 30, -10],
+        boundingbox: [-10, 5, 10, -5],
         keepaspectratio: true,
         showCopyright: false,
         showNavigation: true
@@ -44,7 +52,7 @@
           gradientSecondColor: '#ddd'
       });
       
-      function showScore() {
+      function showResult() {
         var distance = moonControl.X() * earthDiameter;
         var score;
         if (distance <= earthMoonDistance) {
@@ -57,30 +65,30 @@
         if (percentage <= 1) {
           message = "Spot on!";
         } else if (percentage <= 10) {
-          message = "Good guess! You are within 10% of the correct distance.";
+          message = "Good guess! You guess is within 10% of the correct distance.";
         } else if (distance * 2 < earthMoonDistance) {
-          message = "The moon is more than " + Math.floor(earthMoonDistance/distance) + " times further away from the earth!";
+          message = "The moon is more than " + Math.floor(earthMoonDistance/distance) + " times further away from the earth than your guess!";
         } else if (distance > earthMoonDistance * 2) {
-          message = "The moon is more than " + Math.floor(distance/earthMoonDistance) + " times closer to the earth!";
+          message = "The moon is more than " + Math.floor(distance/earthMoonDistance) + " times closer to the earth than your guess!";
         } else if (distance < earthMoonDistance) {
           message = "Too close!";
         } else if (distance > earthMoonDistance) {
           message = "Too far!";
         }
-        alert(message + " Score: " + score + "/10");
-      }
-      
-      function moveToCorrectLocation() {
-        var oldMoon = board.create('circle', [[moonControl.X(), 0.0], 0.5*moonDiameter/earthDiameter], { fixed: true, strokeColor: 'gray', highlight: false, opacity: 0.5 });
+        $('#result').text(message + " Score: " + score + "/10");
+
+        var oldMoon = board.create('circle', [[moonControl.X(), 0.0], 0.5*moonDiameter/earthDiameter], { withLabel:true, fixed: true, strokeColor: 'gray', highlight: false, opacity: 0.5 });
+        oldMoon.setLabelText("Your guess")
         moonControl.moveTo([earthMoonDistance/earthDiameter, 0.0], 2000);
+        board.removeObject(moonControl);
       }
       
       $('#score').click(function () {
-        showScore();
-        moveToCorrectLocation();
+        showResult();
       });
       
     </script>
+
   </body>
 
 </html>
