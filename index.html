@@ -27,26 +27,53 @@
       JXG.Options.zoom.needShift = false;
     
       var board = JXG.JSXGraph.initBoard('box', {
-        boundingbox: [-10, 5, 10, -5],
+        boundingbox: [-1, 5, 20, -5],
         keepaspectratio: true,
         showCopyright: false,
         showNavigation: true
       });
-      var earthDiameter = 12742.0;
-      var moonDiameter = 3475.0;
-      var earthMoonDistance = 389502.0;
+      var earthDiameter = 12742.0; // km
+      var moonDiameter = 3475.0; // km
+      var earthMoonDistance = 389502.0; // km
       
-      var line = board.create('line', [[0.0, 0.0], [1.0, 0.0]], { fixed: true, strokeOpacity: 0, highlightStrokeOpacity: 0});
-      line.setStraight(false, true); // don't draw beyond first point
-      var earth = board.create('circle', [[0.0, 0.0], 0.5], { fixed: true, strokeColor: '#0066CC', fillColor: '#0066CC', highlight: false });
+      var earthRadius = 0.5; // normalized 
+      var moonRadius = 0.5*moonDiameter/earthDiameter;
+      var moonStartDistance = earthRadius + moonRadius; // touching earth
+      
+      var line = board.create('line', [[moonStartDistance, 0.0], [1.0, 0.0]], {
+        fixed: true,
+        strokeOpacity: 0,
+        highlightStrokeOpacity: 0
+      });
+      line.setStraight(false, true); // don't allow moon to be dragged left (beyond first point)
+      
+      var earth = board.create('circle', [[0.0, 0.0], earthRadius], {
+        fixed: true,
+        strokeColor: '#0066CC',
+        fillColor: '#0066CC',
+        highlight: false
+      });
       earth.setProperty({
           gradient: 'linear',
           gradientSecondColor: 'white',
           needsRegularUpdate: false,
           fixed: true
       });
-      var moonControl = board.create('glider', [0.5 + 0.5*moonDiameter/earthDiameter, 0.0, line], { name: "", highlight: false, strokeOpacity: 0, fillOpacity: 0, size: 5, showInfoBox: false });
-      var moon = board.create('circle', [[function() { return moonControl.X(); }, 0.0], 0.5*moonDiameter/earthDiameter], { fixed: true, strokeColor: 'gray', fillColor: 'gray', highlight: false });
+      
+      var moonControl = board.create('glider', [moonStartDistance, 0.0, line], {
+        name: "",
+        highlight: false,
+        strokeOpacity: 0,
+        fillOpacity: 0,
+        size: 5,
+        showInfoBox: false
+      });
+      var moon = board.create('circle', [[function() { return moonControl.X(); }, 0.0], moonRadius], {
+        fixed: true,
+        strokeColor: 'gray',
+        fillColor: 'gray',
+        highlight: false
+      });
       moon.setProperty({
           gradient: 'linear',
           gradientSecondColor: '#ddd'
@@ -77,10 +104,21 @@
         }
         $('#result').text(message + " Score: " + score + "/10");
 
-        var oldMoon = board.create('circle', [[moonControl.X(), 0.0], 0.5*moonDiameter/earthDiameter], { withLabel:true, fixed: true, strokeColor: 'gray', highlight: false, opacity: 0.5 });
-        oldMoon.setLabelText("Your guess")
+        // make sure that all points fit into the viewport
+        board.setBoundingBox([-1, 5, Math.max(earthMoonDistance/earthDiameter, moonControl.X()) + 1, -5], true);
+        board.update();
+
+        var oldMoon = board.create('circle', [[moonControl.X(), 0.0], moonRadius], {
+          withLabel:true,
+          fixed: true,
+          strokeColor: 'gray',
+          highlight: false,
+          opacity: 0.5
+        });
+        oldMoon.setLabelText("Your guess");
+        
         moonControl.moveTo([earthMoonDistance/earthDiameter, 0.0], 2000);
-        board.removeObject(moonControl);
+        board.removeObject(moonControl); // freeze
       }
       
       $('#score').click(function () {
