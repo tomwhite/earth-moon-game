@@ -9,7 +9,7 @@
   <body>
     <div id="explanation" class="content-block">
         <h3>Earth-Moon Game</h3>
-        <p>Object of the game: position the moon by dragging it to the right, so it's the correct distance from the Earth. 
+        <p>Object of the game: position the Moon by dragging it to the right, so it's the correct distance from the Earth. 
           You may need to drag the background to reposition the Earth and Moon as needed, and zoom with the mouse wheel (or pinch on touch device).
         </p>
         <p>When you've finished click "Score" to see how you did.</p>
@@ -94,9 +94,9 @@
         } else if (percentage <= 10) {
           message = "Good guess! You guess is within 10% of the correct distance.";
         } else if (distance * 2 < earthMoonDistance) {
-          message = "The moon is more than " + Math.floor(earthMoonDistance/distance) + " times further away from the earth than your guess!";
+          message = "The Moon is more than " + Math.floor(earthMoonDistance/distance) + " times further away from the Earth than your guess!";
         } else if (distance > earthMoonDistance * 2) {
-          message = "The moon is more than " + Math.floor(distance/earthMoonDistance) + " times closer to the earth than your guess!";
+          message = "The Moon is more than " + Math.floor(distance/earthMoonDistance) + " times closer to the Earth than your guess!";
         } else if (distance < earthMoonDistance) {
           message = "Too close!";
         } else if (distance > earthMoonDistance) {
