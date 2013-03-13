@@ -1,0 +1,86 @@
+<html>
+
+  <head>
+    <title>Earth-Moon</title>
+    <script type="text/javascript" src="jsxgraphcore.js"></script>
+    <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+  </head>
+
+  <body>
+    <div id="box" class="jxgbox" style="width:1500px; height:600px; background:black"></div>
+    <a href="javascript:void();" id="score">Score</a>
+    
+    <script type="text/javascript">
+      JXG.Options.pan.enabled = true;
+      JXG.Options.pan.needShift = false;
+      JXG.Options.pan.needTwoFingers = false;
+    
+      JXG.Options.zoom.wheel = true;
+      JXG.Options.zoom.needShift = false;
+    
+      var board = JXG.JSXGraph.initBoard('box', {
+        boundingbox: [-20, 10, 30, -10],
+        keepaspectratio: true,
+        showCopyright: false,
+        showNavigation: true
+      });
+      var earthDiameter = 12742.0;
+      var moonDiameter = 3475.0;
+      var earthMoonDistance = 389502.0;
+      
+      var line = board.create('line', [[0.0, 0.0], [1.0, 0.0]], { fixed: true, strokeOpacity: 0, highlightStrokeOpacity: 0});
+      line.setStraight(false, true); // don't draw beyond first point
+      var earth = board.create('circle', [[0.0, 0.0], 0.5], { fixed: true, strokeColor: '#0066CC', fillColor: '#0066CC', highlight: false });
+      earth.setProperty({
+          gradient: 'linear',
+          gradientSecondColor: 'white',
+          needsRegularUpdate: false,
+          fixed: true
+      });
+      var moonControl = board.create('glider', [0.5 + 0.5*moonDiameter/earthDiameter, 0.0, line], { name: "", highlight: false, strokeOpacity: 0, fillOpacity: 0, size: 5, showInfoBox: false });
+      var moon = board.create('circle', [[function() { return moonControl.X(); }, 0.0], 0.5*moonDiameter/earthDiameter], { fixed: true, strokeColor: 'gray', fillColor: 'gray', highlight: false });
+      moon.setProperty({
+          gradient: 'linear',
+          gradientSecondColor: '#ddd'
+      });
+      
+      function showScore() {
+        var distance = moonControl.X() * earthDiameter;
+        var score;
+        if (distance <= earthMoonDistance) {
+          score = Math.round(distance * 10.0 / earthMoonDistance);
+        } else {
+          score = Math.round(earthMoonDistance * 10.0 / distance);
+        }
+        var percentage = Math.abs((distance - earthMoonDistance ) * 100.0 / earthMoonDistance);
+        var message;
+        if (percentage <= 1) {
+          message = "Spot on!";
+        } else if (percentage <= 10) {
+          message = "Good guess! You are within 10% of the correct distance.";
+        } else if (distance * 2 < earthMoonDistance) {
+          message = "The moon is more than " + Math.floor(earthMoonDistance/distance) + " times further away from the earth!";
+        } else if (distance > earthMoonDistance * 2) {
+          message = "The moon is more than " + Math.floor(distance/earthMoonDistance) + " times closer to the earth!";
+        } else if (distance < earthMoonDistance) {
+          message = "Too close!";
+        } else if (distance > earthMoonDistance) {
+          message = "Too far!";
+        }
+        alert(message + " Score: " + score + "/10");
+      }
+      
+      function moveToCorrectLocation() {
+        var oldMoon = board.create('circle', [[moonControl.X(), 0.0], 0.5*moonDiameter/earthDiameter], { fixed: true, strokeColor: 'gray', highlight: false, opacity: 0.5 });
+        moonControl.moveTo([earthMoonDistance/earthDiameter, 0.0], 2000);
+      }
+      
+      $('#score').click(function () {
+        showScore();
+        moveToCorrectLocation();
+      });
+      
+    </script>
+  </body>
+
+</html>
