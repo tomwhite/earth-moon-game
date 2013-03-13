@@ -14,11 +14,12 @@
         </p>
         <p>When you've finished click "Score" to see how you did.</p>
     </div>
-    <div id="box" class="jxgbox" style="width:1500px; height:600px; background:black"></div>
+    <div id="box" class="jxgbox" style="height:400px; background:black"></div>
     <div id="result" class="content-block">
       <a href="javascript:void();" id="score">Score</a>
     </div>
     <script type="text/javascript">
+    
       JXG.Options.pan.enabled = true;
       JXG.Options.pan.needShift = false;
       JXG.Options.pan.needTwoFingers = false;
@@ -26,8 +27,19 @@
       JXG.Options.zoom.wheel = true;
       JXG.Options.zoom.needShift = false;
     
+      var width = $('#box').width();
+      var height = $('#box').height();
+
+      function getExtentY(extentX, width, height) {
+        return extentX * height / width;
+      }
+
+      var minX = -1; // so Earth appears on left
+      var extentX = 30; // just a reasonable starting size
+      var extentY = getExtentY(extentX, width, height);
+      
       var board = JXG.JSXGraph.initBoard('box', {
-        boundingbox: [-1, 5, 20, -5],
+        boundingbox: [minX, extentY/2, minX + extentX, -extentY/2],
         keepaspectratio: true,
         showCopyright: false,
         showNavigation: true
@@ -105,7 +117,9 @@
         $('#result').text(message + " Score: " + score + "/10");
 
         // make sure that all points fit into the viewport
-        board.setBoundingBox([-1, 5, Math.max(earthMoonDistance/earthDiameter, moonControl.X()) + 1, -5], true);
+        var extentX = Math.max(earthMoonDistance/earthDiameter, moonControl.X()) + 4 * earthRadius;
+        var extentY = getExtentY(extentX, width, height);
+        board.setBoundingBox([minX, extentY/2, minX + extentX, -extentY/2], true);
         board.update();
 
         var oldMoon = board.create('circle', [[moonControl.X(), 0.0], moonRadius], {
@@ -119,6 +133,8 @@
         
         moonControl.moveTo([earthMoonDistance/earthDiameter, 0.0], 2000);
         board.removeObject(moonControl); // freeze
+        JXG.Options.pan.enabled = false;
+        
       }
       
       $('#score').click(function () {
