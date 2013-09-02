@@ -1,0 +1,50 @@
+<html>
+
+  <head>
+    <title>Sun-Earth</title>
+    <script type="text/javascript" src="jsxgraphcore.js"></script>
+    <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+  </head>
+
+  <body>
+    <div id="box" class="jxgbox" style="height:600px; background:black"></div>
+    <script type="text/javascript">
+    
+    // http://en.wikipedia.org/wiki/Earth%27s_orbit
+    
+    var semimajor = 149598261; // km
+    var focus = 152098232 - semimajor;
+    var sunRadius = 695500/semimajor;
+    var earthRadius = 6371/semimajor;
+    
+    var board = JXG.JSXGraph.initBoard('box', {boundingbox:[-1.1,1.1,1.1,-1.1], keepaspectratio:true});
+
+    var A = board.create('point', [-focus/semimajor,0], { visible:false });
+    var B = board.create('point', [focus/semimajor,0], { visible:false });
+    var C = board.create('point', [1,0], { visible:false });
+    
+    var ell = board.create('ellipse', [A,B,C]);
+ 
+    //var D = board.create('glider', [ell]);
+    
+    var sun = board.create('circle', [[-focus/semimajor,0], sunRadius], {
+      fixed: true,
+      strokeColor: 'yellow',
+      fillColor: 'yellow',
+      highlight: false
+    });
+
+    var earth = board.create('circle', [[1,0], earthRadius], {
+      fixed: true,
+      strokeColor: 'blue',
+      fillColor: 'blue',
+      highlight: false
+    });
+    
+    //D.moveTo([-1, 0], 1000);
+    
+    </script>
+
+  </body>
+
+</html>
